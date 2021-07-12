@@ -6,8 +6,8 @@ from tkinter import ttk
 from pydub import  AudioSegment
 import PIL.Image, PIL.ImageTk, PIL.ImageOps, PIL.ImageDraw, PIL.ImageGrab
 from scrollimage import ScrollableImage
-import os, cv2, time, shutil, pygame, smtplib, ssl, subprocess, threading
-from videotools import *
+import os, cv2, time, shutil, pygame, smtplib, ssl, subprocess, threading, io
+import videotools
 from tooltip import *
 from tkinter.colorchooser import askcolor
 from Sound import Sound
@@ -66,7 +66,7 @@ class Main(TkinterDnD.Tk):
 		self.bind('<Control-n>', lambda x:[self.New()])
 		self.bind('<Control-s>', lambda x:[self.save()])
 		self.bind('<Control-o>', lambda x:[self.Open()])
-		self.bind('<Control-f>', lambda x :[self.clear_color1()])
+		self.bind('<Control-f>', lambda x:[self.clear_color1()])
 		self.bind('<Control-g>', lambda x:[self.clear_color2()])
 
 	def widgets(self):
@@ -164,7 +164,8 @@ class Main(TkinterDnD.Tk):
 		self.acts.place(x = 10, y = 3)
 		create_Tip(self.acts, "Select acts banner")
 		try:
-			self.draw_act = Button(ComicFrame, text = "Draw act", width= 13, relief = GROOVE, command = lambda :[self.img_win.Draw_Image(str(r'imgs/'+self.acts.get()+'.png'), self)])
+			# self.draw_act = Button(ComicFrame, text = "Draw act", width= 13, relief = GROOVE, command = lambda :[self.img_win.Draw_Image(str(r'imgs/'+self.acts.get()+'.png'), self)])
+			self.draw_act = Button(ComicFrame, text = "Draw act", width= 13, relief = GROOVE, command = self.comingsoon)
 			self.draw_act.place(x = 8, y = 44)
 		except:pass
 
@@ -179,7 +180,7 @@ class Main(TkinterDnD.Tk):
 		create_Tip(paint, "Open mspaint if you're running on windows")
 		save = Button(ComicFrame, text = "Save", width = 13, relief = GROOVE, command = self.img_win.save)
 		save.place(x = 8, y = 136)
-		export_ = Button(ComicFrame, text = 'export', width = 13, relief = GROOVE, command = None)
+		export_ = Button(ComicFrame, text = 'export', width = 13, relief = GROOVE, command = self.export2comic)
 		export_.place(x = 8, y = 182)
 		create_Tip(save, "Save image in drawing canvas")
 		create_Tip(export_, "Export comic to PDF")
@@ -197,7 +198,7 @@ class Main(TkinterDnD.Tk):
 		self.tab1.drop_target_register(DND_FILES)
 		self.tab1.dnd_bind('<<Drop>>', self.pic_in)
 		#============END OF REGION================
-
+		
 		#=================Tab2 region==================
 		Sound.initiate
 		self.sound_frame = ttk.LabelFrame(self.tab2, text = "Sound", width = 180, height = 500)
@@ -290,7 +291,7 @@ class Main(TkinterDnD.Tk):
 		create_Tip(self.radio_btn, "Add radio effect to imported sound")
 		create_Tip(self.robot_btn, "Add robotic effect to imported sound")
 		create_Tip(self.ghost_btn, "Add ghost effect to imported sound")
-		create_Tip(self.darth_btn, "Add darth vader effect to imported sound")
+		create_Tip(self.darth_btn, "Add darth vader's (from star wars) voice effect to imported sound")
 
 		_img = PIL.Image.open('imgs/disk.png')
 		# _img = _img.convert('RGB')
@@ -328,7 +329,7 @@ class Main(TkinterDnD.Tk):
 		Next_.place(x = 60, y = 1)
 		del_frame_ = Button(navframe, text = "Delete Frame", width = 10, font = ('Calibri', 12), bg = "black", foreground = "white", activebackground = "grey", highlightbackground = "#bce8f1", highlightthickness = 0.5, borderwidth = "2", command = self.Del_frame)
 		del_frame_.place(x = 116, y = 1)
-		dup_frame = Button(navframe, text = "Dup Frame", width = 10, font = ('Calibri', 12), bg = 'black', foreground = 'white', activebackground = 'grey', highlightbackground = "#bce8f1", highlightthickness = 0.5, borderwidth = '2', command = None)
+		dup_frame = Button(navframe, text = "Dup Frame", width = 10, font = ('Calibri', 12), bg = 'black', foreground = 'white', activebackground = 'grey', highlightbackground = "#bce8f1", highlightthickness = 0.5, borderwidth = '2', command = self.duplicate)
 		dup_frame.place(x = 212, y = 1)
 		create_Tip(prev_, "Go back to the previous frame")
 		create_Tip(Next_, "Go to the next frame")
@@ -343,28 +344,34 @@ class Main(TkinterDnD.Tk):
 		anim_label.place(x = 490, y = 7)
 		preview = Button(anim_label, text = "preview", relief = GROOVE, command = self.Animate)
 		preview.place(x = 10, y = 2)
-		export = Button(anim_label, text = "export", relief = GROOVE, command = None)
+		export = Button(anim_label, text = "export", relief = GROOVE, command = self.export)
 		export.place(x = 70, y = 2)
 		vid_label = ttk.LabelFrame(self.tab3, text = "Edit Video", width = 100, height = 400)
 		vid_label.place(x = 10, y = 70)
-		Merge_Vid = Button(vid_label, text = "Merge Videos", relief = GROOVE, width = 10, command = merge_videos)
+		Merge_Vid = Button(vid_label, text = "Merge Videos", relief = GROOVE, width = 10, command = videotools.merge_videos)
 		Merge_Vid.place(x = 6, y = 2)
-		cut_vid = Button(vid_label, text = "Cut Video", relief = GROOVE, width = 10, command = cut_video)
+		cut_vid = Button(vid_label, text = "Cut Video", relief = GROOVE, width = 10, command = videotools.cut_video)
 		cut_vid.place(x = 6, y = 30)
-		fadeIn = Button(vid_label, text = "Fade In", relief = GROOVE, width = 10, command = fade_in)
+		fadeIn = Button(vid_label, text = "Fade In", relief = GROOVE, width = 10, command = videotools.fade_in)
 		fadeIn.place(x = 6,y = 58)
-		fadeOut = Button(vid_label, text = "Fade Out", relief =GROOVE, width = 10, command= fade_out)
+		fadeOut = Button(vid_label, text = "Fade Out", relief =GROOVE, width = 10, command= videotools.fade_out)
 		fadeOut.place(x = 6, y = 86)
-		BnW = Button(vid_label, text = "BnW", relief = GROOVE, width = 10, command = black_and_white)
+		BnW = Button(vid_label, text = "BnW", relief = GROOVE, width = 10, command = videotools.black_and_white)
 		BnW.place(x = 6, y = 112)
-		EndEffect = Button(vid_label, text = "The End", relief = GROOVE, width = 10, command = TheEndEffect)
+		EndEffect = Button(vid_label, text = "The End", relief = GROOVE, width = 10, command = videotools.TheEndEffect)
 		EndEffect.place(x = 6, y = 138)
-		Editspeed = Button(vid_label, text = "Edit Speed", relief = GROOVE, width = 10, command = EditSpeed)
+		Editspeed = Button(vid_label, text = "Edit Speed", relief = GROOVE, width = 10, command = videotools.EditSpeed)
 		Editspeed.place(x = 6, y = 164)
-		Mute = Button(vid_label, text = "Mute Video", relief = GROOVE, width = 10, command = video_drop)
+		Mute = Button(vid_label, text = "Mute Video", relief = GROOVE, width = 10, command = videotools.video_drop)
 		Mute.place(x = 6, y = 216)
-		Concat = Button(vid_label, text = "Audio+video", relief = GROOVE, width = 10, command=audio_concat_vedio)
+		Concat = Button(vid_label, text = "Audio+video", relief = GROOVE, width = 10, command=videotools.audio_concat_vedio)
 		Concat.place(x = 6, y = 242)
+		blink_ = Button(vid_label, text = "Blink", relief = GROOVE, width = 10, command = videotools._blink_)
+		blink_.place(x = 6, y = 268)
+		even = Button(vid_label, text = "Even size", relief = GROOVE, width = 10, command = videotools.even_video_size)
+		even.place(x = 6, y = 294)
+		time_s = Button(vid_label, text = "time symm", relief = GROOVE, width = 10, command = videotools.time_symm)
+		time_s.place(x = 6, y = 320)
 
 		create_Tip(Merge_Vid, 'Merge/concatenate 2 videos together')
 		create_Tip(preview, 'Preview the animation   F5')
@@ -377,6 +384,9 @@ class Main(TkinterDnD.Tk):
 		create_Tip(EndEffect, "Apply 'The End' effect at the ending of a video")
 		create_Tip(Mute, "Remove sound from video into oblivion")
 		create_Tip(Concat, "Apply a sound to a video")
+		create_Tip(blink_, "apply blink to video clip")
+		create_Tip(even, "Crop video clip to make dimensions even")
+		create_Tip(time_s, "Time symmetrize video, play a video once forward and once backwards")
 		try:
 			img = PIL.Image.open('imgs/skeleton.jpg')
 			img = PIL.ImageTk.PhotoImage(img)
@@ -398,6 +408,15 @@ class Main(TkinterDnD.Tk):
 		self.tab3.drop_target_register(DND_FILES)
 		self.tab3.dnd_bind('<<Drop>>', self.file_in)
 
+	def export2comic(self):
+		from fpdf import FPDF
+		pdf = FPDF()
+		for image in self.images:
+			pdf.add_page()
+			pdf.image(image, 5,5,100,150)
+		pdf.output('comic' + '.pdf', "F")
+
+		
 	def find_audio(self):
 		dir_path = os.path.dirname(os.path.realpath(__file__))
 		for root, dirs, files in os.walk(dir_path):
@@ -600,6 +619,24 @@ class Main(TkinterDnD.Tk):
 			cv2.imwrite(img, blur)
 			self.images[self.n] = img
 
+	def duplicate(self):
+		try:
+			src = self.images[self.n]
+			new = src[:4] + '(copy)' + '.jpg'
+			try:
+				shutil.copy(src, new)
+			except PermissionError:
+				showerror("An error occured", "access is denied, try running Solemn 2D\n as administrator, your pc is restricting the access\n if this doesn't work, try changing the path of your image to somewhere\n that doesn't require admin privileges")
+			self.images.append(new)
+			self.n = self.images.index(new)
+			self.img_win.del_canvas()
+			img = Image.open(new)
+			img = ImageTk.PhotoImage(img)
+			self.img_win = ScrollableImage(root, image = img, scrollbarwidth = 16, width = 700, height = 480, line_width = 10)
+			self.img_win.place(x = 130, y = 100)
+		except IndexError:
+			pass
+	
 	def drawimage(self):
 		img = self.images[self.n]
 		if askyesno("Warning", "Are you sure about this? \nThis would replace the image with the sketched\n one, if you want to keep it, you have to duplicate\n it, click prev and next to refresh and see the image", icon = 'warning'):
@@ -693,7 +730,7 @@ class Main(TkinterDnD.Tk):
 		samp = Samplerate(frame)
 		samp._plot_(data)
 
-	def Open(self):  
+	def Open(self):
 		try:
 			self.file = askopenfilename(title = "Open - Solemn2D 2.0", filetypes = [("All Files", "*.*")])
 		except FileNotFoundError:pass
@@ -726,6 +763,8 @@ class Main(TkinterDnD.Tk):
 		self.SoundTrack = askopenfilename(title = "Open Sound Track - Solemn2D 2.0")
 		self.SoundTrack = AudioSegment.from_mp3(self.SoundTrack)
 		self.update_sound_editing_tools()
+
+	def comingsoon(self):showinfo("Very Sorry", "This feature is not available for this version of the app,\n you can check for the latest verison with the\n version button in the help menu")
 
 	def next_frame(self):
 		self.n += 1
@@ -899,31 +938,31 @@ Send Feedback with the 'send feedback' button to help us
 		showinfo("How to use", file.read())
 
 	def createVid(self, images, fps, title, audio):
-        imgs = []
-        for i in images:
-            img = cv2.imread(i)
-            height, width, layer = img.shape
-            size = (width, height)
-            imgs.append(img)
-        Title = title.replace('.solemn', '')
-        # print(Title)
-        output = cv2.VideoWriter(Title, cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
-        for i in range(len(imgs)):
-            output.write(imgs[i])
-        output.release()
-        if self.SoundTrack is not None:
-            os.popen(f'CMD /K ffmpeg -i ' + Title + ' -i ' + audio +' -map 0:0 -map 1:0 -c:v copy -c:a copy ' + title)
+		imgs = []
+		for i in images:
+			img = cv2.imread(i)
+			height, width, layer = img.shape
+			size = (width, height)
+			imgs.append(img)
+		Title = title.replace('.solemn', '')
+		# print(Title)
+		output = cv2.VideoWriter(Title, cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
+		for i in range(len(imgs)):
+			output.write(imgs[i])
+		output.release()
+		if self.SoundTrack is not None:
+			os.popen(f'CMD /K ffmpeg -i ' + Title + ' -i ' + audio +' -map 0:0 -map 1:0 -c:v copy -c:a copy ' + title)
 
-    def export(self):
-        images = self.images
-        fps = self.FPS.get()
-        self.progressing()
-        title = self.File.replace('.avi', '') + '.avi'
-        try:
-            self.createVid(images, fps, title, audio = self.images[0])
-        except TypeError:
-            showerror("An Error Occured", "You'll need to import an audio to export the project")
-        showinfo("Success", "Your animation was exported succesfully exported to "+title)
+	def export(self):
+		images = self.images
+		fps = self.FPS.get()
+		self.progressing()
+		title = self.File.replace('.avi', '') + '.avi'
+		try:
+			self.createVid(images, fps, title, audio = self.images[0])
+		except TypeError:
+			showerror("An Error Occured", "You'll need to import an audio to export the project")
+		showinfo("Success", "Your animation was exported succesfully exported to "+title)
 
 if __name__=='__main__':
 	Main().mainloop()

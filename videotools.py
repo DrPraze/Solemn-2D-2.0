@@ -1,18 +1,21 @@
-# import moviepy
 import cv2
-# from moviepy.editor import *
 from moviepy.video.tools.drawing import circle
-# from moviepy.video.fx.resize import resize
+# from moviepy.video.fx.all import blink, even_size, time_symmetrize
+from moviepy.video.fx.blackwhite import blackwhite
+from moviepy.video.fx.blink import blink
+from moviepy.video.fx.even_size import even_size
+from moviepy.video.fx.time_symmetrize import time_symmetrize
+
 from tkinter import *
 from tooltip import *
 from tkinter.filedialog import *
 from tkinter.messagebox import *
 from tkinter import ttk
-from moviepy.editor import VideoFileClip, concatenate_videoclips
-from moviepy.video.io.VideoFileClip import VideoFileClip
+# from moviepy.editor import VideoFileClip, concatenate_videoclips
+# from moviepy.video.io.VideoFileClip import VideoFileClip
 # from moviepy.video.VideoClip import ImageClip
 # from moviepy.video.compositing.CompositeVideoClip import CompositeVideoClip
-from moviepy.video import fx
+# from moviepy.video import fx
 
 def merge_videos():
 	def open_clip():
@@ -119,7 +122,7 @@ def fade_in():
 	create_Tip(rate_, "Set the fade-in rate, 15 is good")
 	def faden():
 		clip = VideoFileClip(file_path.get())
-		clipColorx = clip.fx(fx.fadein, Rate.get())
+		clipColorx = clip.fx(vfx.fadein, Rate.get())
 		clipColorx.write_videofile(file)
 	btn = Button(pop, text = "Okay", relief = GROOVE, command = faden)
 	btn.place(x = 50, y = 80)
@@ -154,10 +157,7 @@ def fade_out():
 def black_and_white():
 	clip = cv2.VideoCapture(askopenfilename(title = "Open - Solemn 2D"))
 	if askokcancel('Black and white', 'Are you sure you want to turn this clip into black\n and white? beware that this cannot be reversed.'):
-		# blackwhite(clip, RBG = None, preserve_luminoscity = True)
-		ret, img = clip.read()
-		gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-		# write the black and white frames to the video here
+		blackwhite(clip, RBG = None, preserve_luminoscity = True)
 		showinfo('Success', 'Clip has been successfully converted to black and white')
 
 def TheEndEffect():
@@ -211,6 +211,32 @@ def audio_concat_vedio(self):
     		video.write_videofile(self.path2)
     	except Exception as e:
     		showerror("Error",e)
+
+def _blink_(self):
+	pop = Tk()
+	pop.title('Edit speed of Video')
+	pop.geometry('230x145')
+	pop.resizable(False, False)
+	start = IntVar()
+	startlabel = ttk.LabelFrame(pop, text = "Start blink here (secs)", width = 50, height = 20)
+	startlabel.place(x = 1, y = 2)
+	start_ = Spinbox(startlabel, from_ = 1, textvariable = start, width = 7)
+	start_.place(x = 3, y = 2)
+	create_Tip(start_, "Start the blink from this point in the video, (in seconds)")
+	stop = IntVar()
+	stop_ = Spinbox(startlabel, from_ = 1, textvariable = stop, width = 7)
+	stop_.place(x = 3, y = 10)
+	create_Tip(stop_, "Where to stop the blinki in the video, (in seconds)s")
+	clip = VideoFileClip(askopenfilename(title = "Open - Solemn2D"))
+	blink(clip, start, stop)
+
+def even_video_size(self):
+	clip = VideoFileClip(askopenfilename(title = "Open - Solemn2D"))
+	even_size(clip)
+
+def time_symm(self):
+	clip = VideoFileClip(askopenfilename(title = "Open - Solemn2D"))
+	time_symmetrize(clip)
 
 # fade_in()
 # fade_out()

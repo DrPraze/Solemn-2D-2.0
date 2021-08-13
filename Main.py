@@ -413,9 +413,8 @@ class Main(TkinterDnD.Tk):
 		pdf = FPDF()
 		for image in self.images:
 			pdf.add_page()
-			pdf.image(image, 5,5,100,150)
+			pdf.image(image, 0, 0, 210, 297)
 		pdf.output('comic' + '.pdf', "F")
-
 		
 	def find_audio(self):
 		dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -505,10 +504,6 @@ class Main(TkinterDnD.Tk):
 		sound = self.SoundTrack
 		sound.export(dst, format = 'mp3')
 		data, samplerate = sf.read(self.SoundTrack)
-		# print(data.shape)
-		# print(samplerate)
-		# plt.plot(data)
-		# plt.show()
 		samplerate = int(samplerate*1.5)
 		self.progressing()
 
@@ -520,10 +515,6 @@ class Main(TkinterDnD.Tk):
 		sound = self.SoundTrack
 		sound.export(dst, format = 'mp3')
 		data, samplerate = sf.read(self.SoundTrack)
-		# print(data.shape)
-		# print(samplerate)
-		# plt.plot(data)
-		# plt.show()
 		samplerate = int(samplerate/1.5)
 		# self.progressing()
 		sf.write("output.wav", data, samplerate)
@@ -572,7 +563,6 @@ class Main(TkinterDnD.Tk):
 			img = PIL.ImageTk.PhotoImage(img)
 			self.img_win = ScrollableImage(self.tab1, image = img, scrollbarwidth = 16, width = 700, height = 480, line_width = 10)
 			self.img_win.place(x = 130, y = 100)
-			# self.update_nav()
 		except Exception as E:
 			showerror("An Error Occured", E)
 
@@ -584,15 +574,15 @@ class Main(TkinterDnD.Tk):
 			showerror("An error occured", Err) 
 
 	def file_in(self, e):
-		# try:
-		e = self.tk.splitlist(e.data)[0]
-		with open(e, 'r') as f:
-			data = eval(f.read())
-			self.images = data['Images']
-			self.SoundTrack = data['Sound']
-			f.close()
-		# except Exception as Err:
-			# showerror("Error", Err)
+		try:
+			e = self.tk.splitlist(e.data)[0]
+			with open(e, 'r') as f:
+				data = eval(f.read())
+				self.images = data['Images']
+				self.SoundTrack = data['Sound']
+				f.close()
+		except Exception as Err:
+			showerror("Error", Err)
 
 	def Del_frame(self):
 		if askokcancel('Delete', 'Are you sure you want to delete the current frame?'):
@@ -744,20 +734,19 @@ class Main(TkinterDnD.Tk):
 					img = PIL.Image.open(self.file)
 					self.img_win.change_image(img)
 				except Exception as e:
-					pass
-			if self.file[:4] == '.mp3' or '.wav':
+					showerror('Error', e)
+			elif self.file[:4] == '.mp3' or '.wav':
 				self.SoundTrack = self.file
 				try:
 					self.SoundTrack = AudioSegment.from_mp3(self.file)
 					self.SoundTrack = self.SoundTrack.export(f'{self.file}', format = 'wav')
 				except:pass
 
-			if self.file[:7] == '.solemn':
+			elif self.file[:7] == '.solemn':
 				with open(self.File, 'r') as f:
 					data = eval(f.read())
 					self.images = data['Images']
 					self.SoundTrack = data['Sound']
-					f.close()
 
 	def FetchSound(self):
 		self.SoundTrack = askopenfilename(title = "Open Sound Track - Solemn2D 2.0")

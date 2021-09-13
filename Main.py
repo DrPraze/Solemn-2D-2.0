@@ -29,7 +29,7 @@ class Main(TkinterDnD.Tk):
 		self.FileMenu = Menu(self.menuBar, tearoff = 0)
 		self.ToolMenu = Menu(self.menuBar, tearoff = 0)
 		self.HelpMenu = Menu(self.menuBar, tearoff = 0)
-		self.title('Solemn 2D 2.0')
+		self.title('Solemn2D 2.0 Beta')
 		self.geometry('900x650')
 		self.config(bg = "white")
 		try:self.wm_iconbitmap("imgs\\logo.ico")
@@ -722,7 +722,7 @@ class Main(TkinterDnD.Tk):
 
 	def Open(self):
 		try:
-			self.file = askopenfilename(title = "Open - Solemn2D 2.0", filetypes = [("All Files", "*.*")])
+			self.file = askopenfilename(title = "Open - Solemn2D 2.0 Beta", filetypes = [("All Files", "*.*")])
 		except FileNotFoundError:pass
 		if self.file == '':
 			self.file = None
@@ -749,7 +749,7 @@ class Main(TkinterDnD.Tk):
 					self.SoundTrack = data['Sound']
 
 	def FetchSound(self):
-		self.SoundTrack = askopenfilename(title = "Open Sound Track - Solemn2D 2.0")
+		self.SoundTrack = askopenfilename(title = "Open Sound Track - Solemn2D 2.0 Beta")
 		self.SoundTrack = AudioSegment.from_mp3(self.SoundTrack)
 		self.update_sound_editing_tools()
 
@@ -823,7 +823,7 @@ class Main(TkinterDnD.Tk):
 		self.progress_bar.update()
 
 	def New(self):
-		self.title("Untitled - Solemn2D 2.0")
+		self.title("Untitled - Solemn2D 2.0 Beta")
 		self.file = ''
 		self.images = ['imgs/skeleton.jpg']
 		self.img_win.del_canvas()
@@ -833,11 +833,11 @@ class Main(TkinterDnD.Tk):
 
 	def save(self):         
 		if not os.path.exists(self.File):
-			self.File = asksaveasfilename(title = "Save Project - Solemn2D 2.0", initialfile = 'Untitled.solemn', defaultextension = " .solemn", filetypes = [("Solemn 2D files", "* .solemn")])
+			self.File = asksaveasfilename(title = "Save Project - Solemn2D 2.0 Beta", initialfile = 'Untitled.solemn', defaultextension = " .solemn", filetypes = [("Solemn 2D files", "* .solemn")])
 			if self.File == '':
 				self.File == "Untitled"
 			else:
-				self.title(os.path.basename(self.File).replace('.solemn', '') + "- Solemn2D 2.0")
+				self.title(os.path.basename(self.File).replace('.solemn', '') + "- Solemn2D 2.0 Beta")
 				with open(self.File, 'w+') as f:
 					data = str({"Images":self.images, "Sound":self.SoundTrack})
 					f.write(data)                                                                                                                                                                                                                           
@@ -886,7 +886,17 @@ Send Feedback with the 'send feedback' button to help us
 			import webbrowser
 			pop.destroy()
 			webbrowser.open('https://sourceforge.net/projects/solemn2d/')
+		def fbpage():
+			import webbrowser
+			pop.destroy()
+			webbrowser.open('https://free.facebook.com/Solemn-2D-103383685116755/')
+		def fbcommunity():
+			import webbrowser
+			pop.destroy()
+			webbrowser.open('https://free.facebook.com/groups/1035485006974406/?refid=46&__xts__%5B0%5D=12.Abp9s_gWs6hpN0AfBdw6hp1vtq7cUX9h3B4mUPepXvNnUIQ7E9i9k35OjlIu_pdOJVJEuETMStlWWu3UWM7ac732LpX463zOMr8w7h4X2Be2bAnumSJQuM8NDY-fhAfw_8NWq6sAyFKrNtdRjphOAR7fLzzR9eoS0Zf1crFo-Du9yaGGU0D5Cg3kJDLNSjSYgb8G6MqEHf5Y6ZMcasCtQw-Grndbqt-CrJF-D5UojP5jLfNam5hOV0xdwv1ZHtXHQ5AfXs-M3BvqrPYldn9PXl7N3OTl6TdAFSij8uOevkitnapcF_HoCXbQiHZWrv_nTAgQWQFbxxu8NnV_j4cz-IJ-griVFmd-w3JL-yMpWLt93JNijtjksTa_w4Y5VRgY_g7lwohNQqcjs9Hpg9nA_NZmN0_WWj6VWcB2mRTg27rz-eMVFDgbLHBAP0SkmygCfYlGylgSlyHO8GOWcGucAfaGv7Tv5tRfQD9UbvamqY0MMlWz29eWYk0xwqC9Ha05rdIURgtqRCjm4uJzOngfSccQf3DaHhiYiOUl7vTfpUB1d85NACI8wO7bThl4rO_YFjicJUPAdWvbdDwZhnsBPDOT&_rdc=1&_rdr')
 		button = Button(pop, text = "check latest version", command = checklatest).pack()
+		btn = Button(pop, text = "Like our facebook page", command = fbpage).pack()
+		buttn = Button(pop, text = "Join our community", command = fbcommunity).pack()
 
 	def feedback(self):
 		pop = Tk()
